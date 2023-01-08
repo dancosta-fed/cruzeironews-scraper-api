@@ -102,7 +102,8 @@ app.get('/cruzeiro/:id', async (req, res) => {
 			if (url_id) {
 				const { data } = await axios.get(url_id);
 				const $ = cheerio.load(data)
-				return res.status(200).send($.html());
+
+				return res.status(200).send($("figcaption > div").html());
 			}
 
 			// res.status(200).send(article);
