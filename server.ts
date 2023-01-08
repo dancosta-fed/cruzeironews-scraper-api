@@ -190,7 +190,6 @@ app.get('/deusmedibre/:id', async (req, res) => {
 			)
 		} else {
 			const url_id = article.url;
-			console.log(url_id)
 			if (url_id) {
 				const { data } = await axios.get(url_id);
 				const $ = cheerio.load(data)
@@ -201,5 +200,91 @@ app.get('/deusmedibre/:id', async (req, res) => {
 	}
 });
 
+// getting articles from Ge Globo's website
+app.get("/geglobo", async (req, res) => {
+	const { key } = req.query;
+	const geGloboUrl = "https://ge.globo.com/futebol/times/cruzeiro/"; // site Globo
+
+	if (!key) {
+  	res.status(400).send(
+			`
+				<div>
+					<h4>Please provide API KEY</h4>
+				</div>
+			`
+		);
+	} else {
+		try {
+			// Scrapping news from Cruzeiro's website
+			const { data } = await axios.get(geGloboUrl)
+			const $ = cheerio.load(data)
+			const articleArray = $(".bastian-page > ._evg > ._evt > .bastian-feed-item");
+
+			articleArray.map((id: any, element: any) => {
+
+				const title = $(element).find("h2 > a").text();
+				const url = $(element).find("a").attr("href");
+				const thumbnail = $(element).find(".bstn-fd-picture-image").attr("src");
+				const date = $(element).find(".feed-post-datetime").text();
+
+				// Adding information to the array
+				geGloboArticles.push({
+					id: id,
+					title: title,
+					thumbnail: thumbnail,
+					url: url,
+					publicado: date,
+					portal: 'Globo',
+				});
+			})
+
+			// sending the final array
+			res.status(200).send(geGloboArticles);
+
+		} catch (err: any) {
+			console.error('Error on the endpoint /news/cruzeiro', err);
+			res.status(500).send({message: err.message})
+		}
+	}
+});
+
+// getting Ge Globo's articles by id
+app.get('/geglobo/:id', async (req, res) => {
+	const { key } = req.query;
+
+	if (!key) {
+
+		res.status(400).send(
+			`
+				<div>
+					<h4>Please provide API KEY</h4>
+				</div>
+			`
+		);
+
+	} else {
+		const article = geGloboArticles.find(article => article.id === parseInt(req.params.id));
+
+		// if there is no article with the id
+		if (!article) {
+			return res.status(404).send(
+				`
+					<div>
+						<h1>404</h1>
+						<h3>The article with the given id does not exist</h3>
+					</div>
+				`
+			)
+		} else {
+			const url_id = article.url;
+			if (url_id) {
+				const { data } = await axios.get(url_id);
+				const $ = cheerio.load(data)
+
+				return res.status(200).send($("article").html());
+			}
+		}
+	}
+});
 
 app.listen(port, () => console.log(`Server is running on ${port}...`));
