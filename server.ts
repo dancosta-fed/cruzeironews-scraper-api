@@ -11,6 +11,7 @@ const port = process.env.PORT || 8008;
 const cruzeiroArticles: Article[] = [];
 const deusMeDibreArticles: Article[] = [];
 const geGloboArticles: Article[] = [];
+const onzeMinasArticles: Article[] = [];
 
 // API's home page
 app.get("/", (req, res) => {
@@ -283,6 +284,61 @@ app.get('/geglobo/:id', async (req, res) => {
 
 				return res.status(200).send($("article").html());
 			}
+		}
+	}
+});
+
+// getting articles from Ge Globo's website
+app.get("/onzeminas", async (req, res) => {
+	const { key } = req.query;
+	const onzeMinasUrl = "https://onzeminas.com.br/portal/noticias/cruzeiro/"; // site Onze Minas
+
+	if (!key) {
+  	res.status(400).send(
+			`
+				<div>
+					<h4>Please provide API KEY</h4>
+				</div>
+			`
+		);
+	} else {
+		try {
+			// Scrapping news from Cruzeiro's website
+			const { data } = await axios.get(onzeMinasUrl)
+			const $ = cheerio.load(data)
+			const articleArray = $("article");
+
+			articleArray.map((id: any, element: any) => {
+
+				const title = $(element).find("h2").text();
+				const url = $(element).find("a").attr("href");
+				const thumbnail = $(element).find("img").attr("src");
+
+				console.log({
+					id: id,
+					title: title,
+					thumbnail: thumbnail,
+					url: url,
+
+					portal: 'Globo',
+				})
+
+				// Adding information to the array
+				onzeMinasArticles.push({
+					id: id,
+					title: title,
+					thumbnail: thumbnail,
+					url: url,
+					portal: 'Onze Minas',
+				});
+			})
+
+			// sending the final array
+			res.status(200).send(onzeMinasArticles);
+
+		} catch (err: any) {
+			console.error('Error on the endpoint /news/cruzeiro', err);
+			res.status(500).send({message: err.message})
 		}
 	}
 });
