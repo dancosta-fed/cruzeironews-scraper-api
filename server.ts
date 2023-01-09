@@ -7,7 +7,7 @@ import { Article } from "./types";
 const app = express();
 app.use(cors());
 
-const port = process.env.PORT || 8008;
+const port = process.env.PORT || 8000;
 const cruzeiroArticles: Article[] = [];
 const deusMeDibreArticles: Article[] = [];
 const geGloboArticles: Article[] = [];
