@@ -343,4 +343,43 @@ app.get("/onzeminas", async (req, res) => {
 	}
 });
 
+// getting Ge Globo's articles by id
+app.get('/onzeminas/:id', async (req, res) => {
+	const { key } = req.query;
+
+	if (!key) {
+
+		res.status(400).send(
+			`
+				<div>
+					<h4>Please provide API KEY</h4>
+				</div>
+			`
+		);
+
+	} else {
+		const article = onzeMinasArticles.find(article => article.id === parseInt(req.params.id));
+
+		// if there is no article with the id
+		if (!article) {
+			return res.status(404).send(
+				`
+					<div>
+						<h1>404</h1>
+						<h3>The article with the given id does not exist</h3>
+					</div>
+				`
+			)
+		} else {
+			const url_id = article.url;
+			if (url_id) {
+				const { data } = await axios.get(url_id);
+				const $ = cheerio.load(data)
+
+				return res.status(200).send($(".conteudo-noticia").html());
+			}
+		}
+	}
+});
+
 app.listen(port, () => console.log(`Server is running on ${port}...`));
