@@ -8,7 +8,7 @@
   },
   "scripts": {
 		"start": "node index.ts",
-    "dev": "nodemon server.ts --ignore package.json",
+    "dev": "nodemon index.ts --ignore package.json",
     "test": "echo \"Error: no test specified\" && exit 1",
     "tsc": "tsc"
   },
