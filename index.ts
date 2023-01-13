@@ -54,7 +54,7 @@ app.get("/cruzeiro", async (req, res) => {
 				const date = $(element).find(".date").text();
 
 				cruzeiroArticles.push({
-					id: id,
+					id: ID++,
 					title: title,
 					thumbnail: `https://cruzeiro.com.br${thumbnail}`,
 					url: `https://cruzeiro.com.br${url}`,
@@ -145,7 +145,7 @@ app.get("/deusmedibre", async (req, res) => {
 
 				// Adding information to the array
 				deusMeDibreArticles.push({
-					id: 10 + id,
+					id: ID++,
 					title: title,
 					thumbnail: thumbnail,
 					url: url,
@@ -236,7 +236,7 @@ app.get("/geglobo", async (req, res) => {
 
 				// Adding information to the array
 				geGloboArticles.push({
-					id: 20 + id,
+					id: ID++,
 					title: title,
 					thumbnail: thumbnail,
 					url: url,
@@ -322,7 +322,7 @@ app.get("/onzeminas", async (req, res) => {
 
 				// Adding information to the array
 				onzeMinasArticles.push({
-					id: 30 + id,
+					id: ID++,
 					title: title,
 					thumbnail: thumbnail,
 					url: url,
