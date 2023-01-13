@@ -8,10 +8,10 @@ const app = express();
 app.use(cors());
 
 const port = process.env.PORT || 8000;
-const cruzeiroArticles: Article[] = [];
-const deusMeDibreArticles: Article[] = [];
-const geGloboArticles: Article[] = [];
-const onzeMinasArticles: Article[] = [];
+let cruzeiroArticles: Article[] = [];
+let deusMeDibreArticles: Article[] = [];
+let geGloboArticles: Article[] = [];
+let onzeMinasArticles: Article[] = [];
 let ID = 0;
 // API's home page
 app.get("/", (req, res) => {
@@ -44,6 +44,8 @@ app.get("/cruzeiro", async (req, res) => {
 			const { data } = await axios.get(cruzeiroUrl)
 			const $ = cheerio.load(data)
 			const articleArray = $("#noticias > .nq-c-BlockBanner2Pushs4Thumbnails > .nq-u-hspace > .container > .row > .col");
+			cruzeiroArticles = []
+
 			articleArray.map((id: any, element: any) => {
 
 				const title = $(element).find("h4").text();
@@ -131,6 +133,7 @@ app.get("/deusmedibre", async (req, res) => {
 			const { data } = await axios.get(deusMeDibreUrl)
 			const $ = cheerio.load(data)
 			const articleArray = $("#todos-posts > article");
+			deusMeDibreArticles = []
 
 			articleArray.map((id: any, element: any) => {
 
@@ -142,7 +145,7 @@ app.get("/deusmedibre", async (req, res) => {
 
 				// Adding information to the array
 				deusMeDibreArticles.push({
-					id: id,
+					id: 10 + id,
 					title: title,
 					thumbnail: thumbnail,
 					url: url,
@@ -220,6 +223,9 @@ app.get("/geglobo", async (req, res) => {
 			const { data } = await axios.get(geGloboUrl)
 			const $ = cheerio.load(data)
 			const articleArray = $(".bastian-page > ._evg > ._evt > .bastian-feed-item");
+			console.log('articleArray', articleArray.length)
+			// Clear array
+			geGloboArticles = []
 
 			articleArray.map((id: any, element: any) => {
 
@@ -230,7 +236,7 @@ app.get("/geglobo", async (req, res) => {
 
 				// Adding information to the array
 				geGloboArticles.push({
-					id: id,
+					id: 20 + id,
 					title: title,
 					thumbnail: thumbnail,
 					url: url,
@@ -241,7 +247,6 @@ app.get("/geglobo", async (req, res) => {
 
 			// sending the final array
 			res.status(200).send(geGloboArticles);
-
 		} catch (err: any) {
 			console.error('Error on the endpoint /news/cruzeiro', err);
 			res.status(500).send({message: err.message})
@@ -307,6 +312,7 @@ app.get("/onzeminas", async (req, res) => {
 			const { data } = await axios.get(onzeMinasUrl)
 			const $ = cheerio.load(data)
 			const articleArray = $("article");
+			onzeMinasArticles = [];
 
 			articleArray.map((id: any, element: any) => {
 
@@ -316,7 +322,7 @@ app.get("/onzeminas", async (req, res) => {
 
 				// Adding information to the array
 				onzeMinasArticles.push({
-					id: id,
+					id: 30 + id,
 					title: title,
 					thumbnail: thumbnail,
 					url: url,
