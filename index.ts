@@ -52,7 +52,7 @@ app.get("/cruzeiro", async (req, res) => {
 				const date = $(element).find(".date").text();
 
 				cruzeiroArticles.push({
-					id: ID++,
+					id: id,
 					title: title,
 					thumbnail: `https://cruzeiro.com.br${thumbnail}`,
 					url: `https://cruzeiro.com.br${url}`,
@@ -142,7 +142,7 @@ app.get("/deusmedibre", async (req, res) => {
 
 				// Adding information to the array
 				deusMeDibreArticles.push({
-					id: ID++,
+					id: id,
 					title: title,
 					thumbnail: thumbnail,
 					url: url,
@@ -230,7 +230,7 @@ app.get("/geglobo", async (req, res) => {
 
 				// Adding information to the array
 				geGloboArticles.push({
-					id: ID++,
+					id: id,
 					title: title,
 					thumbnail: thumbnail,
 					url: url,
@@ -314,18 +314,9 @@ app.get("/onzeminas", async (req, res) => {
 				const url = $(element).find("a").attr("href");
 				const thumbnail = $(element).find("img").attr("src");
 
-				console.log({
-					id: id,
-					title: title,
-					thumbnail: thumbnail,
-					url: url,
-
-					portal: 'Globo',
-				})
-
 				// Adding information to the array
 				onzeMinasArticles.push({
-					id: ID++,
+					id: id,
 					title: title,
 					thumbnail: thumbnail,
 					url: url,
