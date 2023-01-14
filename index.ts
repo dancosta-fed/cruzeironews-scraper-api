@@ -72,10 +72,6 @@ app.get("/cruzeiro", async (req, res) => {
 			const articleArray = $("#noticias > .nq-c-BlockBanner2Pushs4Thumbnails > .nq-u-hspace > .container > .row > .col");
 			cruzeiroArticles = []
 
-<<<<<<< HEAD
-			// articleArray.map((id: any, element: any) => {
-=======
->>>>>>> f1be127ee716a313496fba9d8964af4285c7ab51
 			await Promise.all(articleArray.map(async (id: any, element: any) => {
 
 				const title = $(element).find("h4").text();
