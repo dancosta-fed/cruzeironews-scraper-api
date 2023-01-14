@@ -7,4 +7,5 @@ export interface Article {
 	author?: string;
 	portal?: string;
 	post?: string;
+  html: string | undefined
 }
