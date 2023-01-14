@@ -30,6 +30,7 @@ app.get("/", (req, res) => {
 
 
 const getHtml = async (url: string, website: string): Promise<string | null> => {
+
   const { data } = await axios.get(url);
   const $ = cheerio.load(data)
 
@@ -69,7 +70,7 @@ app.get("/cruzeiro", async (req, res) => {
 			// Scrapping news from Cruzeiro's website
 			const { data } = await axios.get(cruzeiroUrl)
 			const $ = cheerio.load(data)
-			const articleArray = $("#noticias > .nq-c-BlockBanner2Pushs4Thumbnails > .nq-u-hspace > .container > .row > .col");
+			const articleArray = $("body > #noticias > .nq-c-BlockBanner2Pushs4Thumbnails > .nq-u-hspace > .container > .row > .col");
 			cruzeiroArticles = []
 
 			await Promise.all(articleArray.map(async (id: any, element: any) => {
@@ -80,8 +81,19 @@ app.get("/cruzeiro", async (req, res) => {
 				const date = $(element).find(".date").text();
         let html = ''
 
-        if (url)
-          html = await getHtml(url, 'cruzeiro') || '';
+        // if (url)
+        //   getHtml(`https://cruzeiro.com.br${url}`, 'cruzeiro')
+				// 		.then((htmlData) => {
+				// 			html = htmlData!
+				// 		})
+				// 		.catch((error) => console.error('html cruzeiro', error));
+				try {
+					if (url) {
+						return html = await getHtml(`https://cruzeiro.com.br${url}`, 'cruzeiro') || '';
+					}
+				} catch (error) {
+					console.error('htmlCruzeiro', error);
+				}
 
 				cruzeiroArticles.push({
 					id: id + 10,
@@ -90,15 +102,16 @@ app.get("/cruzeiro", async (req, res) => {
 					url: `https://cruzeiro.com.br${url}`,
 					publicado: date,
 					portal: 'Cruzeiro',
-          html
+					html
 				});
+
 			}))
 
 			// sending the final array
 			res.status(200).send(cruzeiroArticles);
 
 		} catch (err: any) {
-			console.error('Error on the endpoint /news/cruzeiro', err);
+			console.error('Error on the endpoint /cruzeiro', err);
 			res.status(500).send({message: err.message})
 		}
 	}
@@ -195,7 +208,7 @@ app.get("/deusmedibre", async (req, res) => {
 			res.status(200).send(deusMeDibreArticles);
 
 		} catch (err: any) {
-			console.error('Error on the endpoint /news/cruzeiro', err);
+			console.error('Error on the endpoint /deusMeDibre', err);
 			res.status(500).send({message: err.message})
 		}
 	}
@@ -288,7 +301,7 @@ app.get("/geglobo", async (req, res) => {
 			// sending the final array
 			res.status(200).send(geGloboArticles);
 		} catch (err: any) {
-			console.error('Error on the endpoint /news/cruzeiro', err);
+			console.error('Error on the endpoint /geglobo', err);
 			res.status(500).send({message: err.message})
 		}
 	}
@@ -380,7 +393,7 @@ app.get("/onzeminas", async (req, res) => {
 			res.status(200).send(onzeMinasArticles);
 
 		} catch (err: any) {
-			console.error('Error on the endpoint /news/cruzeiro', err);
+			console.error('Error on the endpoint /onzeminas', err);
 			res.status(500).send({message: err.message})
 		}
 	}
