@@ -46,7 +46,8 @@ app.get("/cruzeiro", async (req, res) => {
 			const articleArray = $("#noticias > .nq-c-BlockBanner2Pushs4Thumbnails > .nq-u-hspace > .container > .row > .col");
 			cruzeiroArticles = []
 
-			articleArray.map((id: any, element: any) => {
+			// articleArray.map((id: any, element: any) => {
+			await Promise.all(articleArray.map(async (id: any, element: any) => {
 
 				const title = $(element).find("h4").text();
 				const url = $(element).find("figure > a").attr("href");
@@ -61,7 +62,7 @@ app.get("/cruzeiro", async (req, res) => {
 					publicado: date,
 					portal: 'Cruzeiro',
 				});
-			})
+			}))
 
 			// sending the final array
 			res.status(200).send(cruzeiroArticles);
@@ -135,7 +136,7 @@ app.get("/deusmedibre", async (req, res) => {
 			const articleArray = $("#todos-posts > article");
 			deusMeDibreArticles = []
 
-			articleArray.map((id: any, element: any) => {
+			await Promise.all(articleArray.map(async (id: any, element: any) => {
 
 				const title = $(element).find("h2").text();
 				const url = $(element).find("a").attr("href");
@@ -153,7 +154,7 @@ app.get("/deusmedibre", async (req, res) => {
 					author: author,
 					portal: 'Deus Me Dibre',
 				});
-			})
+			}))
 
 			// sending the final array
 			res.status(200).send(deusMeDibreArticles);
@@ -227,7 +228,7 @@ app.get("/geglobo", async (req, res) => {
 			// Clear array
 			geGloboArticles = []
 
-			articleArray.map((id: any, element: any) => {
+			await Promise.all(articleArray.map(async (id: any, element: any) => {
 
 				const title = $(element).find("h2 > a").text();
 				const url = $(element).find("a").attr("href");
@@ -243,7 +244,7 @@ app.get("/geglobo", async (req, res) => {
 					publicado: date,
 					portal: 'Globo',
 				});
-			})
+			}))
 
 			// sending the final array
 			res.status(200).send(geGloboArticles);
@@ -314,7 +315,7 @@ app.get("/onzeminas", async (req, res) => {
 			const articleArray = $("article");
 			onzeMinasArticles = [];
 
-			articleArray.map((id: any, element: any) => {
+			await Promise.all(articleArray.map(async (id: any, element: any) => {
 
 				const title = $(element).find("h2").text();
 				const url = $(element).find("a").attr("href");
@@ -328,7 +329,7 @@ app.get("/onzeminas", async (req, res) => {
 					url: url,
 					portal: 'Onze Minas',
 				});
-			})
+			}))
 
 			// sending the final array
 			res.status(200).send(onzeMinasArticles);
