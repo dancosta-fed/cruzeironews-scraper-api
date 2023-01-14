@@ -1,10 +1,13 @@
 import axios from "axios";
 import * as cheerio from 'cheerio';
 import express from "express";
+import * as bodyParser from 'body-parser';
 import cors from "cors";
 import { Article } from "./types";
 
 const app = express();
+app.use(bodyParser.json({ limit: "50mb" }));
+app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));
 app.use(cors());
 
 const port = process.env.PORT || 8000;
@@ -24,6 +27,29 @@ app.get("/", (req, res) => {
 		`
 	);
 })
+
+
+const getHtml = async (url: string, website: string): Promise<string | null> => {
+  const { data } = await axios.get(url);
+  const $ = cheerio.load(data)
+
+  const html = (): string | null => {
+    switch (website) {
+      case 'cruzeiro':
+        return $("figcaption > div").html()
+      case 'onzeMinas':
+        return $(".conteudo-noticia").html()
+      case 'deusMeDibre':
+        return $(".conteudo-post").html()
+      case 'geGlobo':
+        return $("article").html()
+
+      default:
+        return ''
+    }
+  }
+  return html()
+}
 
 // getting articles from Cruzeiro's website
 app.get("/cruzeiro", async (req, res) => {
@@ -46,22 +72,27 @@ app.get("/cruzeiro", async (req, res) => {
 			const articleArray = $("#noticias > .nq-c-BlockBanner2Pushs4Thumbnails > .nq-u-hspace > .container > .row > .col");
 			cruzeiroArticles = []
 
-			articleArray.map((id: any, element: any) => {
+			await Promise.all(articleArray.map(async (id: any, element: any) => {
 
 				const title = $(element).find("h4").text();
 				const url = $(element).find("figure > a").attr("href");
 				const thumbnail = $(element).find("figure > img").attr("src");
 				const date = $(element).find(".date").text();
+        let html = ''
+
+        if (url)
+          html = await getHtml(url, 'cruzeiro') || '';
 
 				cruzeiroArticles.push({
-					id: ID++,
-					title: title,
+					id: id + 10,
+					title,
 					thumbnail: `https://cruzeiro.com.br${thumbnail}`,
 					url: `https://cruzeiro.com.br${url}`,
 					publicado: date,
 					portal: 'Cruzeiro',
+          html
 				});
-			})
+			}))
 
 			// sending the final array
 			res.status(200).send(cruzeiroArticles);
@@ -135,25 +166,30 @@ app.get("/deusmedibre", async (req, res) => {
 			const articleArray = $("#todos-posts > article");
 			deusMeDibreArticles = []
 
-			articleArray.map((id: any, element: any) => {
+			await Promise.all(articleArray.map(async (id: any, element: any) => {
 
 				const title = $(element).find("h2").text();
 				const url = $(element).find("a").attr("href");
 				const thumbnail = $(element).find(".thumbnail > a > img").attr("src");
 				const date = $(element).find(".post-date").text();
 				const author = $(element).find(".post-author > a").text().replace(/(\n\t\t\t\t\t\t|\t\t\t\t\t)/gm, "");
+        let html = ''
+
+        if (url)
+          html = await getHtml(url, 'deusMeDibre') || '';
 
 				// Adding information to the array
 				deusMeDibreArticles.push({
-					id: ID++,
-					title: title,
-					thumbnail: thumbnail,
-					url: url,
+					id: id + 20,
+					title,
+					thumbnail,
+					url,
 					publicado: date,
-					author: author,
+					author,
 					portal: 'Deus Me Dibre',
+          html
 				});
-			})
+			}))
 
 			// sending the final array
 			res.status(200).send(deusMeDibreArticles);
@@ -223,27 +259,31 @@ app.get("/geglobo", async (req, res) => {
 			const { data } = await axios.get(geGloboUrl)
 			const $ = cheerio.load(data)
 			const articleArray = $(".bastian-page > ._evg > ._evt > .bastian-feed-item");
-			console.log('articleArray', articleArray.length)
 			// Clear array
 			geGloboArticles = []
 
-			articleArray.map((id: any, element: any) => {
+			await Promise.all(articleArray.map(async (id: any, element: any) => {
 
 				const title = $(element).find("h2 > a").text();
 				const url = $(element).find("a").attr("href");
 				const thumbnail = $(element).find(".bstn-fd-picture-image").attr("src");
 				const date = $(element).find(".feed-post-datetime").text();
+        let html = ''
+
+        if (url)
+          html = await getHtml(url, 'geGlobo') || '';
 
 				// Adding information to the array
 				geGloboArticles.push({
-					id: ID++,
-					title: title,
-					thumbnail: thumbnail,
-					url: url,
+					id: id + 30,
+					title,
+					thumbnail,
+					url,
 					publicado: date,
 					portal: 'Globo',
+          html
 				});
-			})
+			}))
 
 			// sending the final array
 			res.status(200).send(geGloboArticles);
@@ -314,21 +354,27 @@ app.get("/onzeminas", async (req, res) => {
 			const articleArray = $("article");
 			onzeMinasArticles = [];
 
-			articleArray.map((id: any, element: any) => {
+			await Promise.all(articleArray.map(async (id: any, element: any) => {
 
 				const title = $(element).find("h2").text();
 				const url = $(element).find("a").attr("href");
 				const thumbnail = $(element).find("img").attr("src");
 
+        let html = ''
+
+        if (url)
+          html = await getHtml(url, 'onzeMinas') || '';
+
 				// Adding information to the array
 				onzeMinasArticles.push({
-					id: ID++,
-					title: title,
-					thumbnail: thumbnail,
-					url: url,
+					id: id + 40,
+					title,
+					thumbnail,
+					url,
 					portal: 'Onze Minas',
+          html
 				});
-			})
+			}))
 
 			// sending the final array
 			res.status(200).send(onzeMinasArticles);
