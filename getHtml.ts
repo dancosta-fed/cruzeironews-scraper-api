@@ -4,7 +4,7 @@ import rp from "request-promise";
 
 
 const getHtml = async (url: string, website: string): Promise<string | null> => {
-    console.log('=======================================================================================') 
+    // console.log('Getting all the html...');
     const options: {
         uri: string;
         transform: (body: string) => cheerio.Root;
@@ -12,9 +12,9 @@ const getHtml = async (url: string, website: string): Promise<string | null> => 
         uri: url,
         transform: (body: string) => cheerio.load(body),
       };
-     
+
     const $ = await rp(options);
-  
+
     const html = (): string | null => {
       switch (website) {
         case 'cruzeiro':
@@ -25,7 +25,7 @@ const getHtml = async (url: string, website: string): Promise<string | null> => 
           return $(".conteudo-post").html()
         case 'geGlobo':
           return $("article").html()
-  
+
         default:
           return ''
       }

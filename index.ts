@@ -53,13 +53,13 @@ app.get("/cruzeiro", async (req, res) => {
 			for (let i = 0; i < articleArray.length; i++) {
 				const id:any = articleArray[i];
 				const element = articleArray[i];
-			
+
 				const title = $(element).find("h4").text();
 				const url = $(element).find("figure > a").attr("href");
 				const thumbnail = $(element).find("figure > img").attr("src");
 				const date = $(element).find(".date").text();
 				let html:any = '';
-			
+
 				try {
 					if (url) {
 						html = await getHtml(`https://cruzeiro.com.br${url}`, 'cruzeiro');
@@ -67,9 +67,9 @@ app.get("/cruzeiro", async (req, res) => {
 				} catch (error) {
 					console.error('htmlCruzeiro', error);
 				}
-			
+
 				cruzeiroArticles.push({
-					id: id + 10,
+					id: `${'crz_'+ID++}`,
 					title,
 					thumbnail: `https://cruzeiro.com.br${thumbnail}`,
 					url: `https://cruzeiro.com.br${url}`,
@@ -78,7 +78,7 @@ app.get("/cruzeiro", async (req, res) => {
 					html
 				});
 			}
-			
+
 
 			// sending the final array
 			res.status(200).send(cruzeiroArticles);
@@ -166,7 +166,7 @@ app.get("/deusmedibre", async (req, res) => {
 
 				// Adding information to the array
 				deusMeDibreArticles.push({
-					id: id + 20,
+					id: `${'dmd_'+ID++}`,
 					title,
 					thumbnail,
 					url,
@@ -261,7 +261,7 @@ app.get("/geglobo", async (req, res) => {
 
 				// Adding information to the array
 				geGloboArticles.push({
-					id: id + 30,
+					id: `${'ge_'+ID++}`,
 					title,
 					thumbnail,
 					url,
@@ -353,7 +353,7 @@ app.get("/onzeminas", async (req, res) => {
 
 				// Adding information to the array
 				onzeMinasArticles.push({
-					id: id + 40,
+					id: `${'onz_'+ID++}`,
 					title,
 					thumbnail,
 					url,
