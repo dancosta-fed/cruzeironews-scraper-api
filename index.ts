@@ -4,6 +4,7 @@ import express from "express";
 import * as bodyParser from 'body-parser';
 import cors from "cors";
 import { Article } from "./types";
+import getHtml from "./getHtml";
 
 const app = express();
 app.use(bodyParser.json({ limit: "50mb" }));
@@ -28,34 +29,10 @@ app.get("/", (req, res) => {
 	);
 })
 
-
-const getHtml = async (url: string, website: string): Promise<string | null> => {
-
-  const { data } = await axios.get(url);
-  const $ = cheerio.load(data)
-
-  const html = (): string | null => {
-    switch (website) {
-      case 'cruzeiro':
-        return $("figcaption > div").html()
-      case 'onzeMinas':
-        return $(".conteudo-noticia").html()
-      case 'deusMeDibre':
-        return $(".conteudo-post").html()
-      case 'geGlobo':
-        return $("article").html()
-
-      default:
-        return ''
-    }
-  }
-  return html()
-}
-
 // getting articles from Cruzeiro's website
 app.get("/cruzeiro", async (req, res) => {
 	const { key } = req.query;
-	const cruzeiroUrl = "https://cruzeiro.com.br/noticias";
+	const cruzeiroUrl = "https://cruzeiro.com.br/noticias/";
 
 	if (!key) {
   	res.status(400).send(
@@ -73,28 +50,24 @@ app.get("/cruzeiro", async (req, res) => {
 			const articleArray = $("body > #noticias > .nq-c-BlockBanner2Pushs4Thumbnails > .nq-u-hspace > .container > .row > .col");
 			cruzeiroArticles = []
 
-			await Promise.all(articleArray.map(async (id: any, element: any) => {
-
+			for (let i = 0; i < articleArray.length; i++) {
+				const id:any = articleArray[i];
+				const element = articleArray[i];
+			
 				const title = $(element).find("h4").text();
 				const url = $(element).find("figure > a").attr("href");
 				const thumbnail = $(element).find("figure > img").attr("src");
 				const date = $(element).find(".date").text();
-        let html = ''
-
-        // if (url)
-        //   getHtml(`https://cruzeiro.com.br${url}`, 'cruzeiro')
-				// 		.then((htmlData) => {
-				// 			html = htmlData!
-				// 		})
-				// 		.catch((error) => console.error('html cruzeiro', error));
+				let html:any = '';
+			
 				try {
 					if (url) {
-						return html = await getHtml(`https://cruzeiro.com.br${url}`, 'cruzeiro') || '';
+						html = await getHtml(`https://cruzeiro.com.br${url}`, 'cruzeiro');
 					}
 				} catch (error) {
 					console.error('htmlCruzeiro', error);
 				}
-
+			
 				cruzeiroArticles.push({
 					id: id + 10,
 					title,
@@ -104,8 +77,8 @@ app.get("/cruzeiro", async (req, res) => {
 					portal: 'Cruzeiro',
 					html
 				});
-
-			}))
+			}
+			
 
 			// sending the final array
 			res.status(200).send(cruzeiroArticles);
