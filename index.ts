@@ -60,13 +60,16 @@ app.get("/cruzeiro", async (req, res) => {
 				const date = $(element).find(".date").text();
 				let html:any = '';
 
-				try {
-					if (url) {
-						html = await getHtml(`https://cruzeiro.com.br${url}`, 'cruzeiro');
-					}
-				} catch (error) {
-					console.error('htmlCruzeiro', error);
-				}
+				if (url)
+				html = await getHtml(`https://cruzeiro.com.br${url}`, 'cruzeiro') || '';
+
+				// try {
+				// 	if (url) {
+				// 		html = await getHtml(`https://cruzeiro.com.br${url}`, 'cruzeiro');
+				// 	}
+				// } catch (error) {
+				// 	console.error('htmlCruzeiro', error);
+				// }
 
 				cruzeiroArticles.push({
 					id: `${'crz_'+ID++}`,
