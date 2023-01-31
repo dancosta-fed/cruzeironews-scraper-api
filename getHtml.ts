@@ -3,7 +3,7 @@ import rp from "request-promise";
 
 
 
-const getHtml = async (url: string, website: string): Promise<string | null> => {
+export const getHtml = async (url: string, website: string): Promise<string | null> => {
     // console.log('Getting all the html...');
     const options: {
         uri: string;
@@ -31,6 +31,4 @@ const getHtml = async (url: string, website: string): Promise<string | null> => 
       }
     }
     return html()
-  }
-
-  export default getHtml
+  };

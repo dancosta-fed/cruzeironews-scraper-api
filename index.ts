@@ -4,7 +4,7 @@ import express from "express";
 import * as bodyParser from 'body-parser';
 import cors from "cors";
 import { Article } from "./types";
-import getHtml from "./getHtml";
+import { getHtml } from "./getHtml";
 
 const app = express();
 app.use(bodyParser.json({ limit: "50mb" }));
