@@ -1,8 +1,6 @@
 import * as cheerio from "cheerio";
 import rp from "request-promise";
 
-
-
 export const getHtml = async (url: string, website: string): Promise<string | null> => {
     // console.log('Getting all the html...');
     const options: {

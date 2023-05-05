@@ -5,6 +5,7 @@ import * as bodyParser from 'body-parser';
 import cors from "cors";
 import { Article } from "./types";
 import { getHtml } from "./getHtml";
+import NodeCache from 'node-cache';
 
 const app = express();
 app.use(bodyParser.json({ limit: "50mb" }));
@@ -12,10 +13,20 @@ app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));
 app.use(cors());
 
 const port = process.env.PORT || 8000;
+
+// create a new cache with a default ttl of 5 minutes
+const cache = new NodeCache({ stdTTL: 300, checkperiod: 120 });
+// define the cache keys for each endpoint
+const cacheKeys = {
+  cruzeiro: 'cruzeiro_articles',
+  deusmedibre: 'deusmedibre_articles',
+	geGlobo: 'geGlobo_articles',
+};
+
 let cruzeiroArticles: Article[] = [];
 let deusMeDibreArticles: Article[] = [];
 let geGloboArticles: Article[] = [];
-let onzeMinasArticles: Article[] = [];
+
 let ID = 0;
 // API's home page
 app.get("/", (req, res) => {
@@ -43,6 +54,13 @@ app.get("/cruzeiro", async (req, res) => {
 			`
 		);
 	} else {
+		// check if the results are already cached
+		const cachedArticles = cache.get(cacheKeys.cruzeiro);
+		if (cachedArticles) {
+      console.log('Returning cached Cruzeiro articles');
+      res.status(200).send(cachedArticles);
+    } else {
+
 		try {
 			// Scrapping news from Cruzeiro's website
 			const { data } = await axios.get(cruzeiroUrl)
@@ -63,16 +81,8 @@ app.get("/cruzeiro", async (req, res) => {
 				if (url)
 				html = await getHtml(`https://cruzeiro.com.br${url}`, 'cruzeiro') || '';
 
-				// try {
-				// 	if (url) {
-				// 		html = await getHtml(`https://cruzeiro.com.br${url}`, 'cruzeiro');
-				// 	}
-				// } catch (error) {
-				// 	console.error('htmlCruzeiro', error);
-				// }
-
 				cruzeiroArticles.push({
-					id: `${'crz_'+ID++}`,
+					id: `${'cruzeiro'+ID++} + ${i}`,
 					title,
 					thumbnail: `https://cruzeiro.com.br${thumbnail}`,
 					url: `https://cruzeiro.com.br${url}`,
@@ -81,8 +91,10 @@ app.get("/cruzeiro", async (req, res) => {
 					html
 				});
 			}
-
-
+			// store the articles in cache
+			cache.set(cacheKeys.cruzeiro, cruzeiroArticles);
+			console.log("Cached Cruzeiro articles for 10 minutes");
+		
 			// sending the final array
 			res.status(200).send(cruzeiroArticles);
 
@@ -90,13 +102,12 @@ app.get("/cruzeiro", async (req, res) => {
 			console.error('Error on the endpoint /cruzeiro', err);
 			res.status(500).send({message: err.message})
 		}
-	}
+	}}
 });
 
 // getting cruzeiro's articles by id
 app.get('/cruzeiro/:id', async (req, res) => {
 	const { key } = req.query;
-	const cruzeiroUrl = "https://cruzeiro.com.br/noticias";
 
 	if (!key) {
 
@@ -148,6 +159,12 @@ app.get("/deusmedibre", async (req, res) => {
 			`
 		);
 	} else {
+		// check if the results are already cached
+		const cachedArticles = cache.get(cacheKeys.cruzeiro);
+		if (cachedArticles) {
+			console.log('Returning cached DeusMeDibre articles');
+			res.status(200).send(cachedArticles);
+		} else {
 		try {
 			// Scrapping news from Cruzeiro's website
 			const { data } = await axios.get(deusMeDibreUrl)
@@ -155,7 +172,9 @@ app.get("/deusmedibre", async (req, res) => {
 			const articleArray = $("#todos-posts > article");
 			deusMeDibreArticles = []
 
-			await Promise.all(articleArray.map(async (id: any, element: any) => {
+			for (let i = 0; i < articleArray.length; i++) {
+				const id:any = articleArray[i];
+				const element = articleArray[i];
 
 				const title = $(element).find("h2").text();
 				const url = $(element).find("a").attr("href");
@@ -169,7 +188,7 @@ app.get("/deusmedibre", async (req, res) => {
 
 				// Adding information to the array
 				deusMeDibreArticles.push({
-					id: `${'dmd_'+ID++}`,
+					id: `${'deusmedibre_'+ID++} + ${i}`,
 					title,
 					thumbnail,
 					url,
@@ -178,7 +197,11 @@ app.get("/deusmedibre", async (req, res) => {
 					portal: 'Deus Me Dibre',
           html
 				});
-			}))
+			}
+
+			// store the articles in cache
+			cache.set(cacheKeys.deusmedibre, deusMeDibreArticles);
+			console.log("Cached deusMeDibre articles for 10 minutes");
 
 			// sending the final array
 			res.status(200).send(deusMeDibreArticles);
@@ -187,7 +210,7 @@ app.get("/deusmedibre", async (req, res) => {
 			console.error('Error on the endpoint /deusMeDibre', err);
 			res.status(500).send({message: err.message})
 		}
-	}
+	}}
 });
 
 // getting deusmedibre's articles by id
@@ -243,6 +266,12 @@ app.get("/geglobo", async (req, res) => {
 			`
 		);
 	} else {
+		// check if the results are already cached
+		const cachedArticles = cache.get(cacheKeys.cruzeiro);
+		if (cachedArticles) {
+			console.log('Returning cached GeGlobo articles');
+			res.status(200).send(cachedArticles);
+		} else {
 		try {
 			// Scrapping news from Cruzeiro's website
 			const { data } = await axios.get(geGloboUrl)
@@ -251,7 +280,9 @@ app.get("/geglobo", async (req, res) => {
 			// Clear array
 			geGloboArticles = []
 
-			await Promise.all(articleArray.map(async (id: any, element: any) => {
+			for (let i = 0; i < articleArray.length; i++) {
+				const id:any = articleArray[i];
+				const element = articleArray[i];
 
 				const title = $(element).find("h2 > a").text();
 				const url = $(element).find("a").attr("href");
@@ -264,7 +295,7 @@ app.get("/geglobo", async (req, res) => {
 
 				// Adding information to the array
 				geGloboArticles.push({
-					id: `${'ge_'+ID++}`,
+					id: `${'ge_'+ID++} + ${i}`,
 					title,
 					thumbnail,
 					url,
@@ -272,7 +303,11 @@ app.get("/geglobo", async (req, res) => {
 					portal: 'Globo',
           html
 				});
-			}))
+			}
+
+			// store the articles in cache
+			cache.set(cacheKeys.geGlobo, geGloboArticles);
+			console.log("Cached Globo GE articles for 10 minutes");
 
 			// sending the final array
 			res.status(200).send(geGloboArticles);
@@ -280,7 +315,7 @@ app.get("/geglobo", async (req, res) => {
 			console.error('Error on the endpoint /geglobo', err);
 			res.status(500).send({message: err.message})
 		}
-	}
+	}}
 });
 
 // getting Ge Globo's articles by id
@@ -292,7 +327,7 @@ app.get('/geglobo/:id', async (req, res) => {
 		res.status(400).send(
 			`
 				<div>
-					<h4>Please provide API KEY</h4>
+					<h4 style="color:blue;text-align:center;">Please provide API KEY</h4>
 				</div>
 			`
 		);
@@ -322,96 +357,5 @@ app.get('/geglobo/:id', async (req, res) => {
 	}
 });
 
-// getting articles from Ge Globo's website
-app.get("/onzeminas", async (req, res) => {
-	const { key } = req.query;
-	const onzeMinasUrl = "https://onzeminas.com.br/portal/noticias/cruzeiro/"; // site Onze Minas
-
-	if (!key) {
-  	res.status(400).send(
-			`
-				<div>
-					<h4>Please provide API KEY</h4>
-				</div>
-			`
-		);
-	} else {
-		try {
-			// Scrapping news from Cruzeiro's website
-			const { data } = await axios.get(onzeMinasUrl)
-			const $ = cheerio.load(data)
-			const articleArray = $("article");
-			onzeMinasArticles = [];
-
-			await Promise.all(articleArray.map(async (id: any, element: any) => {
-
-				const title = $(element).find("h2").text();
-				const url = $(element).find("a").attr("href");
-				const thumbnail = $(element).find("img").attr("src");
-
-        let html = ''
-
-        if (url)
-          html = await getHtml(url, 'onzeMinas') || '';
-
-				// Adding information to the array
-				onzeMinasArticles.push({
-					id: `${'onz_'+ID++}`,
-					title,
-					thumbnail,
-					url,
-					portal: 'Onze Minas',
-          html
-				});
-			}))
-
-			// sending the final array
-			res.status(200).send(onzeMinasArticles);
-
-		} catch (err: any) {
-			console.error('Error on the endpoint /onzeminas', err);
-			res.status(500).send({message: err.message})
-		}
-	}
-});
-
-// getting Ge Globo's articles by id
-app.get('/onzeminas/:id', async (req, res) => {
-	const { key } = req.query;
-
-	if (!key) {
-
-		res.status(400).send(
-			`
-				<div>
-					<h4>Please provide API KEY</h4>
-				</div>
-			`
-		);
-
-	} else {
-		const article = onzeMinasArticles.find(article => article.id === parseInt(req.params.id));
-
-		// if there is no article with the id
-		if (!article) {
-			return res.status(404).send(
-				`
-					<div>
-						<h1>404</h1>
-						<h3>The article with the given id does not exist</h3>
-					</div>
-				`
-			)
-		} else {
-			const url_id = article.url;
-			if (url_id) {
-				const { data } = await axios.get(url_id);
-				const $ = cheerio.load(data)
-
-				return res.status(200).send($(".conteudo-noticia").html());
-			}
-		}
-	}
-});
-
-app.listen(port, () => console.log(`Server is running on ${port}...`));
+const server = app.listen(port, () => console.log(`Server is running on ${port}...`));
+server.timeout = 5000;
