@@ -160,7 +160,7 @@ app.get("/deusmedibre", async (req, res) => {
 		);
 	} else {
 		// check if the results are already cached
-		const cachedArticles = cache.get(cacheKeys.cruzeiro);
+		const cachedArticles = cache.get(cacheKeys.deusmedibre);
 		if (cachedArticles) {
 			console.log('Returning cached DeusMeDibre articles');
 			res.status(200).send(cachedArticles);
@@ -267,7 +267,7 @@ app.get("/geglobo", async (req, res) => {
 		);
 	} else {
 		// check if the results are already cached
-		const cachedArticles = cache.get(cacheKeys.cruzeiro);
+		const cachedArticles = cache.get(cacheKeys.geGlobo);
 		if (cachedArticles) {
 			console.log('Returning cached GeGlobo articles');
 			res.status(200).send(cachedArticles);
