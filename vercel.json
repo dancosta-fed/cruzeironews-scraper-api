@@ -2,7 +2,7 @@
   "version": 2,
   "name": "crznews-api",
   "public": true,
-  "build": [
+  "builds": [
     { 
       "src": "./index.ts",
       "use": "@vercel/node" 
