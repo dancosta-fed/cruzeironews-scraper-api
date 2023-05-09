@@ -7,6 +7,8 @@ import { Article } from "./types";
 import { getHtml } from "./getHtml";
 import NodeCache from 'node-cache';
 
+const CRZNEW_API_KEY = "crzdan"
+
 const app = express();
 app.use(bodyParser.json({ limit: "50mb" }));
 app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));
@@ -45,7 +47,7 @@ app.get("/cruzeiro", async (req, res) => {
 	const { key } = req.query;
 	const cruzeiroUrl = "https://cruzeiro.com.br/noticias/";
 
-	if (!key) {
+	if (key !== CRZNEW_API_KEY) {
   	res.status(400).send(
 			`
 				<div>
@@ -109,7 +111,7 @@ app.get("/cruzeiro", async (req, res) => {
 app.get('/cruzeiro/:id', async (req, res) => {
 	const { key } = req.query;
 
-	if (!key) {
+	if (key !== CRZNEW_API_KEY) {
 
 		res.status(400).send(
 			`
@@ -150,7 +152,7 @@ app.get("/deusmedibre", async (req, res) => {
 	const { key } = req.query;
 	const deusMeDibreUrl = "https://deusmedibre.com.br/cruzeiro/";
 
-	if (!key) {
+	if (key !== CRZNEW_API_KEY) {
   	res.status(400).send(
 			`
 				<div>
@@ -217,7 +219,7 @@ app.get("/deusmedibre", async (req, res) => {
 app.get('/deusmedibre/:id', async (req, res) => {
 	const { key } = req.query;
 
-	if (!key) {
+	if (key !== CRZNEW_API_KEY) {
 
 		res.status(400).send(
 			`
@@ -257,7 +259,7 @@ app.get("/geglobo", async (req, res) => {
 	const { key } = req.query;
 	const geGloboUrl = "https://ge.globo.com/futebol/times/cruzeiro/"; // site Globo
 
-	if (!key) {
+	if (key !== CRZNEW_API_KEY) {
   	res.status(400).send(
 			`
 				<div>
@@ -322,7 +324,7 @@ app.get("/geglobo", async (req, res) => {
 app.get('/geglobo/:id', async (req, res) => {
 	const { key } = req.query;
 
-	if (!key) {
+	if (key !== CRZNEW_API_KEY) {
 
 		res.status(400).send(
 			`
