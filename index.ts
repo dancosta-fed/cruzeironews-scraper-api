@@ -15,7 +15,7 @@ app.use(cors());
 const port = process.env.PORT || 8000;
 
 // create a new cache with a default ttl of 5 minutes
-const cache = new NodeCache({ stdTTL: 6000, checkperiod: 180*60 });
+const cache = new NodeCache({ stdTTL: 300, checkperiod: 180*60 });
 // define the cache keys for each endpoint
 const cacheKeys = {
   cruzeiro: 'cruzeiro_articles',
@@ -100,7 +100,7 @@ app.get("/cruzeiro", async (req, res) => {
 
 		} catch (err: any) {
 			console.error('Error on the endpoint /cruzeiro', err);
-			res.status(500).send({message: err.message})
+			res.status(500).send('Internal server error')
 		}
 	}}
 });
