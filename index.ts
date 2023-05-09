@@ -12,7 +12,7 @@ app.use(bodyParser.json({ limit: "50mb" }));
 app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));
 app.use(cors());
 
-const port = process.env.PORT || 8000;
+const port = process.env.PORT || 8001;
 
 // create a new cache with a default ttl of 5 minutes
 const cache = new NodeCache({ stdTTL: 300, checkperiod: 180*60 });
